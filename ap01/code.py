@@ -33,14 +33,20 @@ class Sala:
         for x in range(len(self.piso)):
             for y in range(len(self.piso[0])):
                 probabilidade = uniform(0, 1)
-                if((x, y) in self.hot_spots_sujeira):
-                    if(probabilidade < 0.1):
-                        self.piso[x][y] = self.sujeira
-                        print(probabilidade)
-                else:
-                    if(probabilidade < 0.01):
-                        self.piso[x][y] = self.sujeira
-                        print(probabilidade)
+                if (self.pos_aspirador == self.pos_base):
+                    self.piso[self.pos_aspirador[0]][self.pos_aspirador[1]] = 3
+                elif (self.pos_aspirador != self.pos_base):
+                    self.piso[self.pos_base[0]][self.pos_base[1]] = 4
+                
+                if (self.piso[x][y] == 0):
+                    if((x, y) in self.hot_spots_sujeira):
+                        if(probabilidade < 0.1):
+                            self.piso[x][y] = self.sujeira
+                            print(probabilidade)
+                    else:
+                        if(probabilidade < 0.01):
+                            self.piso[x][y] = self.sujeira
+                            print(probabilidade)
         print(self.piso)
      # Escreva seu código aqui levando em conta o pseudo-código para
      # adicionar sujeira com maior probabilidade em certos locais:
@@ -106,8 +112,8 @@ def main():
     # cria o ambiente contendo o meu aspirador
     ambiente = Sala((M, N), [(5, 5), (5, 4), (5, 3)], [
                     (2, 2), (3, 3)], meu_aspirador, (0, 0), (0, 0))
-    # sumila 100 passos do ambiente
-    ambiente.run(100)
+    # simula 10 passos do ambiente
+    ambiente.run(10)
 
 
 if __name__ == "__main__":
