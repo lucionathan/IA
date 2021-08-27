@@ -29,7 +29,6 @@ class Sala:
 
     def step(self):  # atualiza sujeira, realiza a interação do agente-ambiente
 
-        print("abubleble")
         for x in range(len(self.piso)):
             for y in range(len(self.piso[0])):
                 probabilidade = uniform(0, 1)
@@ -42,12 +41,15 @@ class Sala:
                     if((x, y) in self.hot_spots_sujeira):
                         if(probabilidade < 0.1):
                             self.piso[x][y] = self.sujeira
-                            print(probabilidade)
+                            #print(probabilidade)
                     else:
                         if(probabilidade < 0.01):
                             self.piso[x][y] = self.sujeira
-                            print(probabilidade)
+                            #print(probabilidade)
+        
         print(self.piso)
+        print("Energia atual:", self.aspirador.get_energia())
+        print()
      # Escreva seu código aqui levando em conta o pseudo-código para
      # adicionar sujeira com maior probabilidade em certos locais:
 
@@ -67,6 +69,7 @@ class Sala:
 
     def run(self, N):  # chama step N vezes para simular o agente e o seu ambiente
         for i in range(N):
+            print("Passo:", i)
             self.step()
 
 
@@ -74,8 +77,8 @@ class Aspirador:
 
     def __init__(self, energia_aspirador, M, N):
         self.energia = energia_aspirador
-        self.actions = ["frente", "esq", "dir",
-                        "tras", "aspirar", "recarregar"]
+        self.actions = ["norte", "oeste", "leste",
+                        "sul", "aspirar", "recarregar"]
         # diz respeito à celula imediatamente à frente do agente se obstáculo
         self.status_percepção = ["sujo", "vazio", "obstaculo"]
 
@@ -97,6 +100,9 @@ class Aspirador:
     def print_status():  # imprime posição do agente, o seu modelo interno do ambiente, nível da bateria
         print("asd")
 
+    def get_energia(self):
+        return self.energia
+
 
 # Código de teste
 ######################
@@ -105,13 +111,13 @@ class Aspirador:
 def main():
     """Função principal da aplicação.
     """
-    M = 10
-    N = 10
+    M = 4
+    N = 4
     meu_aspirador = Aspirador(100, M, N)
 
     # cria o ambiente contendo o meu aspirador
-    ambiente = Sala((M, N), [(5, 5), (5, 4), (5, 3)], [
-                    (2, 2), (3, 3)], meu_aspirador, (0, 0), (0, 0))
+    ambiente = Sala((M, N), [(1, 2), (2, 1)], [
+                    (2, 2), (1, 1)], meu_aspirador, (0, 0), (0, 0))
     # simula 10 passos do ambiente
     ambiente.run(10)
 
