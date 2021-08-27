@@ -8,18 +8,16 @@ class Sala:
         self.vazio = 0
         self.obstaculo = 1
         self.sujeira = 2
-        self.aspirador = aspirador
         self.locais_sujeira = locais_sujeira
         self.piso = np.zeros((size[0], size[1]), dtype=int)
         
-        for x in range(len(lista_obstaculos)): #disrtibuindo obstaculos
+        for x in range(len(lista_obstaculos)): #distribuindo obstaculos
             self.piso[lista_obstaculos[x][0]][lista_obstaculos[x][1]] = self.obstaculo
 
         self.piso[posicao_aspirador[0]][posicao_aspirador[1]] = 3
-
-        print(self.piso)
         self.posicao_aspirador = posicao_aspirador
-        self.possicao_base = posicao_base_recarregamento
+        self.aspirador = aspirador
+        self.posicao_base = posicao_base_recarregamento
 
     # Escreva seu código aqui levando em conta que:
      # o piso recebe valor vazio em todo lugar e
@@ -32,10 +30,10 @@ class Sala:
             for y in range(len(self.piso[0])):
                 probabilidade = uniform(0, 1)
                 
-                if (self.posicao_aspirador == self.possicao_base):
+                if (self.posicao_aspirador == self.posicao_base):
                     self.piso[self.posicao_aspirador[0]][self.posicao_aspirador[1]] = 3
-                elif (self.posicao_aspirador != self.possicao_base):
-                    self.piso[self.possicao_base[0]][self.possicao_base[1]] = 4
+                elif (self.posicao_aspirador != self.posicao_base):
+                    self.piso[self.posicao_base[0]][self.posicao_base[1]] = 4
                 
                 if (self.piso[x][y] == 0):
                     if((x, y) in self.locais_sujeira):
@@ -48,7 +46,7 @@ class Sala:
                             #print(probabilidade)
         
         print(self.piso)
-        print("Energia atual:", self.aspirador.get_energia())
+        self.aspirador.print_status()
         print()
      # Escreva seu código aqui levando em conta o pseudo-código para
      # adicionar sujeira com maior probabilidade em certos locais:
@@ -66,8 +64,6 @@ class Sala:
      # ação recomendada pelo próprio agente
      # imprimir o estado do ambiente
      # imprimir o estado do Agente aspirador
-    def get_posicao_aspirador():
-        return self.posicao_aspirador
 
     def run(self, N):  # chama step N vezes para simular o agente e o seu ambiente
         for i in range(N):
@@ -77,22 +73,23 @@ class Sala:
 
 class Aspirador:
 
-    def __init__(self, energia_aspirador, M, N):
+    def __init__(self, energia_aspirador, M, N, posicao_aspirador):
         self.energia = energia_aspirador
-        self.mivimentos = {
+        self.movimentos = {
                         "norte": lambda l: [l[0],l[1] + 1],
-                        "sul": lambda l: [l[0],l[1] + 1],
-                        "oeste": lambda l: [l[0] - 1,l[1] + 1],
-                        "leste": lambda l: [l[0] + 1,l[1] + 1],
+                        "sul": lambda l: [l[0],l[1] - 1],
+                        "oeste": lambda l: [l[0] - 1,l[1]],
+                        "leste": lambda l: [l[0] + 1,l[1]],
                         }
 
         # diz respeito à celula imediatamente à frente do agente se obstáculo
-        self.status_percepção = ["sujo", "vazio", "obstaculo"]
+        self.status_percepcao = ["sujo", "vazio", "obstaculo"]
 
       # consulta o ambiente para obter as coordenadas
         # registra as experiências do robô.
-        self.modelo_ambiente = np.zeros([M, N])
+        self.modelo_ambiente = np.zeros((M, N), dtype=int)
       # no modelo é guardado: contador de sujeira (0...MAX) ou obstáculo (-1)
+        self.posicao_aspirador = posicao_aspirador
 
    # definida a partir do contador de sujeira e da posição atual.
     # avaliação_heurística = np.array([dimX, dimY], int)
@@ -105,12 +102,11 @@ class Aspirador:
        # realizar busca heurística usando a avaliação heurística, o modelo do ambiente e a percepção corrente.
        # considerar que ele deve retornar à base quando a bateria estiver crítica
 
-    def print_status():  # imprime posição do agente, o seu modelo interno do ambiente, nível da bateria
-        print("asd")
-
-    def get_energia(self):
-        return self.energia
-
+    def print_status(self):  # imprime posição do agente, o seu modelo interno do ambiente, nível da bateria
+        print("Posição do Aspirador:", self.posicao_aspirador)
+        print("Nível de bateria:", self.energia)
+        print("Modelo interno do ambiente:")
+        print(self.modelo_ambiente)
 
 # Código de teste
 ######################
@@ -121,14 +117,19 @@ def main():
     """
     M = 4
     N = 4
-    meu_aspirador = Aspirador(100, M, N)
+    posicao_inicial_aspirador = (0, 0)
+
+    meu_aspirador = Aspirador(100, M, N, posicao_inicial_aspirador)
 
     # cria o ambiente contendo o meu aspirador
     ambiente = Sala((M, N), [(1, 2), (2, 1)], [
-                    (2, 2), (1, 1)], meu_aspirador, (0, 0), (0, 0))
+                    (2, 2), (1, 1)], meu_aspirador, posicao_inicial_aspirador, (0, 0))
+
     # simula 10 passos do ambiente
     ambiente.run(10)
 
 
 if __name__ == "__main__":
     main()
+
+#tem 4 sensores
