@@ -10,9 +10,10 @@ class Sala:
         self.sujeira = 2
         self.locais_sujeira = locais_sujeira
         self.piso = np.zeros((size[0], size[1]), dtype=int)
-        
-        for x in range(len(lista_obstaculos)): #distribuindo obstaculos
-            self.piso[lista_obstaculos[x][0]][lista_obstaculos[x][1]] = self.obstaculo
+
+        for x in range(len(lista_obstaculos)):  # distribuindo obstaculos
+            self.piso[lista_obstaculos[x][0]
+                      ][lista_obstaculos[x][1]] = self.obstaculo
 
         self.piso[posicao_aspirador[0]][posicao_aspirador[1]] = 3
         self.posicao_aspirador = posicao_aspirador
@@ -25,49 +26,48 @@ class Sala:
      # a sujeira deve ser atualizada no método step() pois, mesmo quando o agente limpa,
      # a sujeira deverá reaparecer com certa probabilidade
     def update_matrix(self):
-        
-        nova_posicao = self.aspirador.update_posicao('oeste')#teste hihihi
+
+        nova_posicao = self.aspirador.update_posicao('leste')  # teste hihihi
 
         linha = self.posicao_aspirador[0]
         coluna = self.posicao_aspirador[1]
-        
+
         linha_nova = nova_posicao[0]
         coluna_nova = nova_posicao[1]
-        
+
         self.piso[linha][coluna] = 0
         self.piso[linha_nova][coluna_nova] = 3
 
         self.posicao_aspirador = nova_posicao
 
-
-    
     def step(self):  # atualiza sujeira, realiza a interação do agente-ambiente
 
         for x in range(len(self.piso)):
             for y in range(len(self.piso[0])):
                 probabilidade = uniform(0, 1)
-                
+
                 if (self.posicao_aspirador == self.posicao_base):
-                    self.piso[self.posicao_aspirador[0]][self.posicao_aspirador[1]] = 3
+                    self.piso[self.posicao_aspirador[0]
+                              ][self.posicao_aspirador[1]] = 3
                 elif (self.posicao_aspirador != self.posicao_base):
                     self.piso[self.posicao_base[0]][self.posicao_base[1]] = 4
-                
+
                 if (self.piso[x][y] == 0):
                     if((x, y) in self.locais_sujeira):
                         if(probabilidade < 0.1):
                             self.piso[x][y] = self.sujeira
-                            #print(probabilidade)
+                            # print(probabilidade)
                     else:
                         if(probabilidade < 0.01):
                             self.piso[x][y] = self.sujeira
-                            #print(probabilidade)
-        
+                            # print(probabilidade)
+
         print(self.piso)
-        
+
         self.aspirador.print_status()
-        
+
         self.update_matrix()
-        
+
         print()
      # Escreva seu código aqui levando em conta o pseudo-código para
      # adicionar sujeira com maior probabilidade em certos locais:
@@ -91,16 +91,17 @@ class Sala:
             print("Passo:", i)
             self.step()
 
+
 class Aspirador:
 
     def __init__(self, energia_aspirador, M, N, posicao_aspirador):
         self.energia = energia_aspirador
         self.movimentos = {
-                        "norte": lambda l: [l[0]-1,l[1]],
-                        "sul": lambda l: [l[0]+1,l[1]],
-                        "oeste": lambda l: [l[0],l[1]-1],
-                        "leste": lambda l: [l[0],l[1]+1],
-                        }
+            "norte": lambda l: [l[0]-1, l[1]],
+            "sul": lambda l: [l[0]+1, l[1]],
+            "oeste": lambda l: [l[0], l[1]-1],
+            "leste": lambda l: [l[0], l[1]+1],
+        }
 
         # diz respeito à celula imediatamente à frente do agente se obstáculo
         self.status_percepcao = ["sujo", "vazio", "obstaculo"]
@@ -113,12 +114,12 @@ class Aspirador:
 
     # definida a partir do contador de sujeira e da posição atual.
     # avaliação_heurística = np.array([dimX, dimY], int)
-    def percepcao(self): 
+    def percepcao(self):
         return 0
-    
-    def update_matrix(self,posicao,tipo):
-        #nova_posicao = self.aspirador.update_posicao(self.aspirador.movimentos[f'{direcao}'](direcao))#teste hihihi
-        #print(self.posicao_aspirador)
+
+    def update_matrix(self, posicao, tipo):
+        # nova_posicao = self.aspirador.update_posicao(self.aspirador.movimentos[f'{direcao}'](direcao))#teste hihihi
+        # print(self.posicao_aspirador)
         if (tipo == 3):
             linha = self.posicao_aspirador[0]
             coluna = self.posicao_aspirador[1]
@@ -126,44 +127,35 @@ class Aspirador:
 
         linha_nova = posicao[0]
         coluna_nova = posicao[1]
-        
+
         self.modelo_ambiente[linha_nova][coluna_nova] = tipo
 
         self.posicao_aspirador = posicao
-        #print(self.posicao_aspirador)
+        # print(self.posicao_aspirador)
 
     def update_posicao(self, direcao):
-        #retornar posição atual utilizando a função do set acoes em cima da posição atual do aspirador
-        #ta andando so pra um lado HAUDHUASHDUASHDUASHdAUSD
-        criterio = lambda k: not (k[0] > len(self.modelo_ambiente)-1) and (k[1] < len(self.modelo_ambiente[0]))
+        # retornar posição atual utilizando a função do set acoes em cima da posição atual do aspirador
         posicao = self.posicao_aspirador
         print(self.posicao_aspirador)
         nova_posicao = self.movimentos[f'{direcao}'](self.posicao_aspirador)
         print(self.posicao_aspirador)
-        if not ((nova_posicao[0] > len(self.modelo_ambiente)-1 or nova_posicao[0] < -len(self.modelo_ambiente)) or (nova_posicao[1] > len(self.modelo_ambiente[0])-1 or nova_posicao[1] < -len(self.modelo_ambiente[1]))):
+        if((nova_posicao[0] < len(self.modelo_ambiente) and nova_posicao[0] >= 0) and (nova_posicao[1] < len(self.modelo_ambiente[0]) and (nova_posicao[1] > 0))):
             posicao = nova_posicao
         else:
             nova_posicao = posicao
 
-        #print(self.posicao_aspirador)
-        
-        '''
-        if nova_posicao[0] >= 0 and nova_posicao[1] >= 0:
-            if not (nova_posicao[0] > len(self.modelo_ambiente)-1) and (nova_posicao[1] < len(self.modelo_ambiente[0])):
-                self.posicao_aspirador = nova_posicao
-        '''
         if(posicao != self.posicao_aspirador):
-            self.update_matrix(nova_posicao,3)
-        
+            self.update_matrix(nova_posicao, 3)
+
         return posicao
-            
 
     def action_agent_program(self, percepção):
         print("teste")
        # realizar busca heurística usando a avaliação heurística, o modelo do ambiente e a percepção corrente.
        # considerar que ele deve retornar à base quando a bateria estiver crítica
 
-    def print_status(self):  # imprime posição do agente, o seu modelo interno do ambiente, nível da bateria
+    # imprime posição do agente, o seu modelo interno do ambiente, nível da bateria
+    def print_status(self):
         print("Posição do Aspirador:", self.posicao_aspirador)
         print("Nível de bateria:", self.energia)
         print("Modelo interno do ambiente:")
@@ -172,6 +164,7 @@ class Aspirador:
 # Código de teste
 ######################
 # criar aspirador com 100% de energia
+
 
 def main():
     """Função principal da aplicação.
@@ -187,10 +180,10 @@ def main():
                     (2, 2), (1, 1)], meu_aspirador, posicao_inicial_aspirador, (0, 0))
 
     # simula 10 passos do ambiente
-    ambiente.run(10)
+    ambiente.run(5)
 
 
 if __name__ == "__main__":
     main()
 
-#tem 4 sensores
+# tem 4 sensores
