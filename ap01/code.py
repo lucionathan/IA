@@ -24,6 +24,23 @@ class Sala:
      # você deve colocar obstáculos nas coordenadas recebidas no 2o parâmetro do construtor
      # a sujeira deve ser atualizada no método step() pois, mesmo quando o agente limpa,
      # a sujeira deverá reaparecer com certa probabilidade
+    def update_matrix(self):
+        
+        nova_posicao = self.aspirador.update_posicao(self.aspirador.movimentos['sul'](self.aspirador.posicao_aspirador))#teste hihihi
+        
+        linha = self.posicao_aspirador[0]
+        coluna = self.posicao_aspirador[1]
+        
+        linha_nova = nova_posicao[0]
+        coluna_nova = nova_posicao[1]
+        
+        self.piso[linha][coluna] = 0
+        self.piso[linha_nova][coluna_nova] = 3
+
+        self.posicao_aspirador = nova_posicao
+
+
+    
     def step(self):  # atualiza sujeira, realiza a interação do agente-ambiente
 
         for x in range(len(self.piso)):
@@ -46,7 +63,10 @@ class Sala:
                             #print(probabilidade)
         
         print(self.piso)
+        
+        #self.update_matrix()
         self.aspirador.print_status()
+        
         print()
      # Escreva seu código aqui levando em conta o pseudo-código para
      # adicionar sujeira com maior probabilidade em certos locais:
@@ -76,10 +96,10 @@ class Aspirador:
     def __init__(self, energia_aspirador, M, N, posicao_aspirador):
         self.energia = energia_aspirador
         self.movimentos = {
-                        "norte": lambda l: [l[0],l[1] + 1],
-                        "sul": lambda l: [l[0],l[1] - 1],
-                        "oeste": lambda l: [l[0] - 1,l[1]],
-                        "leste": lambda l: [l[0] + 1,l[1]],
+                        "norte": lambda l: [l[0]-1,l[1]],
+                        "sul": lambda l: [l[0]+1,l[1]],
+                        "oeste": lambda l: [l[0],l[1]-1],
+                        "leste": lambda l: [l[0],l[1]+1],
                         }
 
         # diz respeito à celula imediatamente à frente do agente se obstáculo
@@ -93,9 +113,15 @@ class Aspirador:
 
    # definida a partir do contador de sujeira e da posição atual.
     # avaliação_heurística = np.array([dimX, dimY], int)
+    
     def update_posicao(self, nova_posicao):
         #retornar posição atual utilizando a função do set acoes em cima da posição atual do aspirador
-        print("aaaaa")
+        #ta andando so pra um lado HAUDHUASHDUASHDUASHdAUSD
+        if not (nova_posicao[0] > len(self.modelo_ambiente)-1 and nova_posicao[1] < len(self.modelo_ambiente[0])-1):
+            self.posicao_aspirador = nova_posicao
+
+        return self.posicao_aspirador
+            
 
     def action_agent_program(self, percepção):
         print("teste")
@@ -117,7 +143,7 @@ def main():
     """
     M = 4
     N = 4
-    posicao_inicial_aspirador = (0, 0)
+    posicao_inicial_aspirador = [0, 0]
 
     meu_aspirador = Aspirador(100, M, N, posicao_inicial_aspirador)
 
