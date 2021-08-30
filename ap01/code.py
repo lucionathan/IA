@@ -26,8 +26,8 @@ class Sala:
      # a sujeira deverá reaparecer com certa probabilidade
     def update_matrix(self):
         
-        nova_posicao = self.aspirador.update_posicao(self.aspirador.movimentos['sul'](self.aspirador.posicao_aspirador))#teste hihihi
-        
+        nova_posicao = self.aspirador.update_posicao(self.aspirador.movimentos['norte'](self.aspirador.posicao_aspirador))#teste hihihi
+
         linha = self.posicao_aspirador[0]
         coluna = self.posicao_aspirador[1]
         
@@ -64,7 +64,7 @@ class Sala:
         
         print(self.piso)
         
-        #self.update_matrix()
+        self.update_matrix()
         self.aspirador.print_status()
         
         print()
@@ -89,7 +89,6 @@ class Sala:
         for i in range(N):
             print("Passo:", i)
             self.step()
-
 
 class Aspirador:
 
@@ -117,8 +116,9 @@ class Aspirador:
     def update_posicao(self, nova_posicao):
         #retornar posição atual utilizando a função do set acoes em cima da posição atual do aspirador
         #ta andando so pra um lado HAUDHUASHDUASHDUASHdAUSD
-        if not (nova_posicao[0] > len(self.modelo_ambiente)-1 and nova_posicao[1] < len(self.modelo_ambiente[0])-1):
-            self.posicao_aspirador = nova_posicao
+        if nova_posicao[0] >= 0 and nova_posicao[1] >= 0:
+            if not (nova_posicao[0] > len(self.modelo_ambiente)-1) and (nova_posicao[1] < len(self.modelo_ambiente[0])) :
+                self.posicao_aspirador = nova_posicao
 
         return self.posicao_aspirador
             
