@@ -26,7 +26,7 @@ class Sala:
      # a sujeira deverá reaparecer com certa probabilidade
     def update_matrix(self):
         
-        nova_posicao = self.aspirador.update_posicao(self.aspirador.movimentos['norte'](self.aspirador.posicao_aspirador))#teste hihihi
+        nova_posicao = self.aspirador.update_posicao('oeste')#teste hihihi
 
         linha = self.posicao_aspirador[0]
         coluna = self.posicao_aspirador[1]
@@ -64,8 +64,9 @@ class Sala:
         
         print(self.piso)
         
-        self.update_matrix()
         self.aspirador.print_status()
+        
+        self.update_matrix()
         
         print()
      # Escreva seu código aqui levando em conta o pseudo-código para
@@ -110,17 +111,51 @@ class Aspirador:
       # no modelo é guardado: contador de sujeira (0...MAX) ou obstáculo (-1)
         self.posicao_aspirador = posicao_aspirador
 
-   # definida a partir do contador de sujeira e da posição atual.
+    # definida a partir do contador de sujeira e da posição atual.
     # avaliação_heurística = np.array([dimX, dimY], int)
+    def percepcao(self): 
+        return 0
     
-    def update_posicao(self, nova_posicao):
+    def update_matrix(self,posicao,tipo):
+        #nova_posicao = self.aspirador.update_posicao(self.aspirador.movimentos[f'{direcao}'](direcao))#teste hihihi
+        #print(self.posicao_aspirador)
+        if (tipo == 3):
+            linha = self.posicao_aspirador[0]
+            coluna = self.posicao_aspirador[1]
+            self.modelo_ambiente[linha][coluna] = 0
+
+        linha_nova = posicao[0]
+        coluna_nova = posicao[1]
+        
+        self.modelo_ambiente[linha_nova][coluna_nova] = tipo
+
+        self.posicao_aspirador = posicao
+        #print(self.posicao_aspirador)
+
+    def update_posicao(self, direcao):
         #retornar posição atual utilizando a função do set acoes em cima da posição atual do aspirador
         #ta andando so pra um lado HAUDHUASHDUASHDUASHdAUSD
-        if nova_posicao[0] >= 0 and nova_posicao[1] >= 0:
-            if not (nova_posicao[0] > len(self.modelo_ambiente)-1) and (nova_posicao[1] < len(self.modelo_ambiente[0])) :
-                self.posicao_aspirador = nova_posicao
+        criterio = lambda k: not (k[0] > len(self.modelo_ambiente)-1) and (k[1] < len(self.modelo_ambiente[0]))
+        posicao = self.posicao_aspirador
+        print(self.posicao_aspirador)
+        nova_posicao = self.movimentos[f'{direcao}'](self.posicao_aspirador)
+        print(self.posicao_aspirador)
+        if not ((nova_posicao[0] > len(self.modelo_ambiente)-1 or nova_posicao[0] < -len(self.modelo_ambiente)) or (nova_posicao[1] > len(self.modelo_ambiente[0])-1 or nova_posicao[1] < -len(self.modelo_ambiente[1]))):
+            posicao = nova_posicao
+        else:
+            nova_posicao = posicao
 
-        return self.posicao_aspirador
+        #print(self.posicao_aspirador)
+        
+        '''
+        if nova_posicao[0] >= 0 and nova_posicao[1] >= 0:
+            if not (nova_posicao[0] > len(self.modelo_ambiente)-1) and (nova_posicao[1] < len(self.modelo_ambiente[0])):
+                self.posicao_aspirador = nova_posicao
+        '''
+        if(posicao != self.posicao_aspirador):
+            self.update_matrix(nova_posicao,3)
+        
+        return posicao
             
 
     def action_agent_program(self, percepção):
