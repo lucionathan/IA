@@ -1,5 +1,5 @@
 import numpy as np
-from random import uniform
+from random import uniform, randint
 
 
 class Sala:
@@ -26,8 +26,26 @@ class Sala:
      # a sujeira deve ser atualizada no método step() pois, mesmo quando o agente limpa,
      # a sujeira deverá reaparecer com certa probabilidade
     def update_matrix(self):
+        norte, sul, leste, oeste = -1, -1, -1, -1
+        if(self.posicao_aspirador[0] > 0):
+            norte = self.piso[self.posicao_aspirador[0] -
+                              1][self.posicao_aspirador[1]]
+        if(self.posicao_aspirador[0] < len(self.piso)-1):
+            sul = self.piso[self.posicao_aspirador[0] +
+                            1][self.posicao_aspirador[1]]
+        if(self.posicao_aspirador[1] < len(self.piso[0])-1):
 
-        nova_posicao = self.aspirador.update_posicao('leste')  # teste hihihi
+            leste = self.piso[self.posicao_aspirador[0]
+                              ][self.posicao_aspirador[1]+1]
+        print(leste)
+        if(self.posicao_aspirador[1] > 0):
+
+            oeste = self.piso[self.posicao_aspirador[0]
+                              ][self.posicao_aspirador[1]-1]
+        print(oeste)
+
+        nova_posicao = self.aspirador.action_agent_program(
+            [norte, sul, leste, oeste])
 
         linha = self.posicao_aspirador[0]
         coluna = self.posicao_aspirador[1]
@@ -118,8 +136,6 @@ class Aspirador:
         return 0
 
     def update_matrix(self, posicao, tipo):
-        # nova_posicao = self.aspirador.update_posicao(self.aspirador.movimentos[f'{direcao}'](direcao))#teste hihihi
-        # print(self.posicao_aspirador)
         if (tipo == 3):
             linha = self.posicao_aspirador[0]
             coluna = self.posicao_aspirador[1]
@@ -149,12 +165,30 @@ class Aspirador:
 
         return posicao
 
-    def action_agent_program(self, percepção):
-        print("teste")
-       # realizar busca heurística usando a avaliação heurística, o modelo do ambiente e a percepção corrente.
-       # considerar que ele deve retornar à base quando a bateria estiver crítica
+    def action_agent_program(self, percepcao):
+        # realizar busca heurística usando a avaliação heurística, o modelo do ambiente e a percepção corrente.
+        # considerar que ele deve retornar à base quando a bateria estiver crítica
+        print(percepcao)
 
+        cords = ["norte", "sul", "leste", "oeste"]
+
+        if(percepcao[0] == 1):
+            return self.update_posicao(cords[0])
+        elif(percepcao[1] == 1):
+            return self.update_posicao(cords[1])
+        elif(percepcao[2] == 1):
+            return self.update_posicao(cords[2])
+        elif(percepcao[3] == 1):
+            return self.update_posicao(cords[3])
+        else:
+            flag = True
+            while(flag):
+                pos = randint(0, 3)
+                if(percepcao[pos] != -1 and percepcao[pos] != 2):
+                    flag = False
+                    return self.update_posicao(cords[pos])
     # imprime posição do agente, o seu modelo interno do ambiente, nível da bateria
+
     def print_status(self):
         print("Posição do Aspirador:", self.posicao_aspirador)
         print("Nível de bateria:", self.energia)
@@ -177,10 +211,10 @@ def main():
 
     # cria o ambiente contendo o meu aspirador
     ambiente = Sala((M, N), [(1, 2), (2, 1)], [
-                    (2, 2), (1, 1)], meu_aspirador, posicao_inicial_aspirador, (0, 0))
+        (2, 2), (1, 1)], meu_aspirador, posicao_inicial_aspirador, (0, 0))
 
     # simula 10 passos do ambiente
-    ambiente.run(5)
+    ambiente.run(20)
 
 
 if __name__ == "__main__":
