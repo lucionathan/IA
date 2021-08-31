@@ -179,6 +179,12 @@ class Aspirador:
         print("comando: limpou")
         limpou = True
         return self.andar(cords, pos, limpou)
+
+    def carregar(self, cords, pos):
+        print("comando: carregou")
+        self.energia = 100
+        return self.andar(cords, pos)
+
     def andar(self, cords, pos, limpou = False):
         print("comando: andou")
         self.energia -= 1 
