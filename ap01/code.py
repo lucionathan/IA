@@ -30,28 +30,32 @@ class Sala:
         if(self.posicao_aspirador[0] > 0):
             norte = self.piso[self.posicao_aspirador[0] -
                               1][self.posicao_aspirador[1]]
+
         if(self.posicao_aspirador[0] < len(self.piso)-1):
             sul = self.piso[self.posicao_aspirador[0] +
                             1][self.posicao_aspirador[1]]
+                            
         if(self.posicao_aspirador[1] < len(self.piso[0])-1):
-
             leste = self.piso[self.posicao_aspirador[0]
                               ][self.posicao_aspirador[1]+1]
-        print(leste)
-        if(self.posicao_aspirador[1] > 0):
 
+        if(self.posicao_aspirador[1] > 0):
             oeste = self.piso[self.posicao_aspirador[0]
                               ][self.posicao_aspirador[1]-1]
-        print(oeste)
 
-        nova_posicao = self.aspirador.action_agent_program(
+        nova_posicao, piso_limpo = self.aspirador.action_agent_program(
             [norte, sul, leste, oeste])
+    
+        print("nova_posicao:", nova_posicao)
+        print("piso_limpo:", piso_limpo)
 
         linha = self.posicao_aspirador[0]
         coluna = self.posicao_aspirador[1]
 
         linha_nova = nova_posicao[0]
         coluna_nova = nova_posicao[1]
+
+        # if (self.piso[linha_nova][coluna_nova] == self.posicao_base):
 
         self.piso[linha][coluna] = 0
         self.piso[linha_nova][coluna_nova] = 3
@@ -85,8 +89,6 @@ class Sala:
         self.aspirador.print_status()
 
         self.update_matrix()
-
-        print()
      # Escreva seu código aqui levando em conta o pseudo-código para
      # adicionar sujeira com maior probabilidade em certos locais:
 
@@ -106,8 +108,10 @@ class Sala:
 
     def run(self, N):  # chama step N vezes para simular o agente e o seu ambiente
         for i in range(N):
+            print("\n--------------------------------------------\n")
             print("Passo:", i)
             self.step()
+        print(self.piso)
 
 
 class Aspirador:
@@ -127,7 +131,9 @@ class Aspirador:
       # consulta o ambiente para obter as coordenadas
         # registra as experiências do robô.
         self.modelo_ambiente = np.zeros((M, N), dtype=int)
+        self.modelo_ambiente[posicao_aspirador[0]][posicao_aspirador[1]] = 4
       # no modelo é guardado: contador de sujeira (0...MAX) ou obstáculo (-1)
+        self.posicao_base = posicao_aspirador
         self.posicao_aspirador = posicao_aspirador
 
     # definida a partir do contador de sujeira e da posição atual.
@@ -139,15 +145,18 @@ class Aspirador:
         if (tipo == 3):
             linha = self.posicao_aspirador[0]
             coluna = self.posicao_aspirador[1]
-            self.modelo_ambiente[linha][coluna] = 0
+            print("posicao_aspirador:", self.posicao_aspirador)
+            print("posicao_base:", self.posicao_base)
+            if [linha, coluna] != self.posicao_base:
+                self.modelo_ambiente[linha][coluna] = 0
+            else:
+                self.modelo_ambiente[linha][coluna] = 4
+            self.posicao_aspirador = posicao
 
         linha_nova = posicao[0]
         coluna_nova = posicao[1]
 
         self.modelo_ambiente[linha_nova][coluna_nova] = tipo
-
-        self.posicao_aspirador = posicao
-        # print(self.posicao_aspirador)
 
     def update_posicao(self, direcao):
         # retornar posição atual utilizando a função do set acoes em cima da posição atual do aspirador
