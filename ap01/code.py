@@ -160,19 +160,30 @@ class Aspirador:
 
     def update_posicao(self, direcao):
         # retornar posição atual utilizando a função do set acoes em cima da posição atual do aspirador
-        posicao = self.posicao_aspirador
-        print(self.posicao_aspirador)
-        nova_posicao = self.movimentos[f'{direcao}'](self.posicao_aspirador)
-        print(self.posicao_aspirador)
-        if((nova_posicao[0] < len(self.modelo_ambiente) and nova_posicao[0] >= 0) and (nova_posicao[1] < len(self.modelo_ambiente[0]) and (nova_posicao[1] > 0))):
-            posicao = nova_posicao
-        else:
-            nova_posicao = posicao
+        # posicao = self.posicao_aspirador
+        # print(self.posicao_aspirador)
+        nova_posicao = self.movimentos[f'{direcao}'](self.posicao_aspirador) # mano alguém explica oq é isso pfvkkkkkk
+        # print(self.posicao_aspirador)
+        # if((nova_posicao[0] < len(self.modelo_ambiente) and nova_posicao[0] >= 0) and (nova_posicao[1] < len(self.modelo_ambiente[0]) and (nova_posicao[1] > 0))):
+        #     posicao = nova_posicao
+        # else:
+        #     nova_posicao = posicao
 
-        if(posicao != self.posicao_aspirador):
-            self.update_matrix(nova_posicao, 3)
+        # if(posicao != self.posicao_aspirador):
+        # print("nova posicao:", nova_posicao)
+        self.update_matrix(nova_posicao, 3)
 
-        return posicao
+        return nova_posicao
+
+    def limpar(self, cords, pos):
+        print("comando: limpou")
+        limpou = True
+        return self.andar(cords, pos, limpou)
+    def andar(self, cords, pos, limpou = False):
+        print("comando: andou")
+        self.energia -= 1 
+        posicao = self.update_posicao(cords[pos])
+        return (posicao, limpou)
 
     def action_agent_program(self, percepcao):
         # realizar busca heurística usando a avaliação heurística, o modelo do ambiente e a percepção corrente.
@@ -180,22 +191,16 @@ class Aspirador:
         print(percepcao)
 
         cords = ["norte", "sul", "leste", "oeste"]
-
-        if(percepcao[0] == 1):
-            return self.update_posicao(cords[0])
-        elif(percepcao[1] == 1):
-            return self.update_posicao(cords[1])
-        elif(percepcao[2] == 1):
-            return self.update_posicao(cords[2])
-        elif(percepcao[3] == 1):
-            return self.update_posicao(cords[3])
-        else:
-            flag = True
-            while(flag):
-                pos = randint(0, 3)
-                if(percepcao[pos] != -1 and percepcao[pos] != 2):
-                    flag = False
-                    return self.update_posicao(cords[pos])
+        funcoes_validas = [[0, self.andar], [1, self.registra_obstaculo], [2, self.limpar], [4, self.carregar]]
+                
+        funcao_invalida = True
+        while(funcao_invalida):
+            pos = randint(0, 3)
+            for funcao in funcoes_validas:
+                if(percepcao[pos] == funcao[0]):
+                    funcao_invalida = False
+                    return funcao[1](cords, pos)
+                    
     # imprime posição do agente, o seu modelo interno do ambiente, nível da bateria
 
     def print_status(self):
