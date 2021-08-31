@@ -191,10 +191,16 @@ class Aspirador:
         posicao = self.update_posicao(cords[pos])
         return (posicao, limpou)
 
+    def registra_obstaculo(self, cords, pos):
+        print("comando: registrou obstáculo")
+        posicao_obstaculo = self.movimentos[f'{cords[pos]}'](self.posicao_aspirador) 
+        self.update_matrix(posicao_obstaculo, 1)
+        return(self.posicao_aspirador, False)
+
     def action_agent_program(self, percepcao):
         # realizar busca heurística usando a avaliação heurística, o modelo do ambiente e a percepção corrente.
         # considerar que ele deve retornar à base quando a bateria estiver crítica
-        print(percepcao)
+        print("sensores:", percepcao)
 
         cords = ["norte", "sul", "leste", "oeste"]
         funcoes_validas = [[0, self.andar], [1, self.registra_obstaculo], [2, self.limpar], [4, self.carregar]]
@@ -215,10 +221,12 @@ class Aspirador:
         print("Modelo interno do ambiente:")
         print(self.modelo_ambiente)
 
+
 # Código de teste
 ######################
 # criar aspirador com 100% de energia
 
+# TODO voltar para a base
 
 def main():
     """Função principal da aplicação.
@@ -234,10 +242,12 @@ def main():
         (2, 2), (1, 1)], meu_aspirador, posicao_inicial_aspirador, (0, 0))
 
     # simula 10 passos do ambiente
-    ambiente.run(20)
+    ambiente.run(50)
 
 
 if __name__ == "__main__":
     main()
+
+    
 
 # tem 4 sensores
