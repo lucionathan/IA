@@ -1,5 +1,5 @@
 import numpy as np
-from random import uniform, randint
+from random import uniform, randint, choice
 
 
 class Sala:
@@ -203,15 +203,14 @@ class Aspirador:
         print("sensores:", percepcao)
 
         cords = ["norte", "sul", "leste", "oeste"]
-        funcoes_validas = [[0, self.andar], [1, self.registra_obstaculo], [2, self.limpar], [4, self.carregar]]
+        funcoes_validas = {0: self.andar, 1: self.registra_obstaculo, 2: self.limpar, 4: self.carregar}
                 
         funcao_invalida = True
         while(funcao_invalida):
-            pos = randint(0, 3)
-            for funcao in funcoes_validas:
-                if(percepcao[pos] == funcao[0]):
-                    funcao_invalida = False
-                    return funcao[1](cords, pos)
+            pos = randint(0,3)
+            if percepcao[pos] != -1:
+                funcao_invalida = False
+                return funcoes_validas[percepcao[pos]](cords, pos)
                     
     # imprime posição do agente, o seu modelo interno do ambiente, nível da bateria
 
