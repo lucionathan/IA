@@ -21,6 +21,7 @@ class Sala:
         self.posicao_aspirador = posicao_aspirador
         self.aspirador = aspirador
         self.posicao_base = posicao_base_recarregamento
+        self.piso_anterior = 4
 
     # Escreva seu código aqui levando em conta que:
      # o piso recebe valor vazio em todo lugar e
@@ -50,7 +51,11 @@ class Sala:
 
         # if (self.piso[linha_nova][coluna_nova] == self.posicao_base):
 
-        self.piso[linha][coluna] = 0
+        if (piso_limpo):
+            self.piso[linha][coluna] = 0
+        else:
+            self.piso[linha][coluna] = self.piso_anterior
+            self.piso_anterior = self.piso[linha_nova][coluna_nova]
         self.piso[linha_nova][coluna_nova] = 3
 
         self.posicao_aspirador = nova_posicao
