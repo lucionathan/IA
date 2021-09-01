@@ -1,6 +1,6 @@
 import numpy as np
 from random import uniform, randint, choice
-
+from collections import deque
 
 class Sala:
 
@@ -26,22 +26,7 @@ class Sala:
      # a sujeira deve ser atualizada no método step() pois, mesmo quando o agente limpa,
      # a sujeira deverá reaparecer com certa probabilidade
     def update_matrix(self):
-        norte, sul, leste, oeste = -1, -1, -1, -1
-        if(self.posicao_aspirador[0] > 0):
-            norte = self.piso[self.posicao_aspirador[0] -
-                              1][self.posicao_aspirador[1]]
-
-        if(self.posicao_aspirador[0] < len(self.piso)-1):
-            sul = self.piso[self.posicao_aspirador[0] +
-                            1][self.posicao_aspirador[1]]
-                            
-        if(self.posicao_aspirador[1] < len(self.piso[0])-1):
-            leste = self.piso[self.posicao_aspirador[0]
-                              ][self.posicao_aspirador[1]+1]
-
-        if(self.posicao_aspirador[1] > 0):
-            oeste = self.piso[self.posicao_aspirador[0]
-                              ][self.posicao_aspirador[1]-1]
+        norte, sul, leste, oeste = self.get_vizinhos(self.posicao_aspirador)
 
         nova_posicao, piso_limpo = self.aspirador.action_agent_program(
             [norte, sul, leste, oeste])
@@ -61,6 +46,26 @@ class Sala:
         self.piso[linha_nova][coluna_nova] = 3
 
         self.posicao_aspirador = nova_posicao
+
+    def get_vizinhos(self, pos):
+        norte, sul, leste, oeste = -1, -1, -1, -1
+        if(pos[0] > 0):
+            norte = self.piso[pos[0] -
+                              1][pos[1]]
+
+        if(pos[0] < len(self.piso)-1):
+            sul = self.piso[pos[0] +
+                            1][pos[1]]
+                            
+        if(pos[1] < len(self.piso[0])-1):
+            leste = self.piso[pos[0]
+                              ][pos[1]+1]
+
+        if(pos[1] > 0):
+            oeste = self.piso[pos[0]
+                              ][pos[1]-1]
+                              
+        return norte,sul,leste,oeste
 
     def step(self):  # atualiza sujeira, realiza a interação do agente-ambiente
 
@@ -162,7 +167,7 @@ class Aspirador:
         # retornar posição atual utilizando a função do set acoes em cima da posição atual do aspirador
         # posicao = self.posicao_aspirador
         # print(self.posicao_aspirador)
-        nova_posicao = self.movimentos[f'{direcao}'](self.posicao_aspirador) # mano alguém explica oq é isso pfvkkkkkk
+        nova_posicao = self.movimentos[f'{direcao}'](self.posicao_aspirador)
         # print(self.posicao_aspirador)
         # if((nova_posicao[0] < len(self.modelo_ambiente) and nova_posicao[0] >= 0) and (nova_posicao[1] < len(self.modelo_ambiente[0]) and (nova_posicao[1] > 0))):
         #     posicao = nova_posicao
@@ -228,8 +233,6 @@ class Aspirador:
             if percepcoes[pos] in lista_chaves:
                 funcao_invalida = False
                 return funcoes_validas[percepcoes[pos]](cords, pos)
-
-
                     
     # imprime posição do agente, o seu modelo interno do ambiente, nível da bateria
 
@@ -245,7 +248,6 @@ class Aspirador:
 # criar aspirador com 100% de energia
 
 # TODO voltar para a base
-
 def main():
     """Função principal da aplicação.
     """
