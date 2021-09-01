@@ -265,7 +265,7 @@ class Aspirador:
             # print(self.caminho_pra_base)
             # print(self.consumo_pra_base)
             if(self.consumo_pra_base > self.energia-2):
-                # print("comando: voltando pra base")
+                print("comando: voltando pra base")
                 resultado = self.andar_por_xy(self.caminho_pra_base[0])
                 del self.caminho_pra_base[0]
                 # print(resultado)
