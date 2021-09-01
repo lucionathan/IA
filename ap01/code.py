@@ -177,6 +177,7 @@ class Aspirador:
 
     def limpar(self, cords, pos):
         print("comando: limpou")
+        self.energia -= 5
         limpou = True
         return self.andar(cords, pos, limpou)
 
@@ -248,14 +249,14 @@ class Aspirador:
 def main():
     """Função principal da aplicação.
     """
-    M = 4
-    N = 4
+    M = 5
+    N = 5
     posicao_inicial_aspirador = [0, 0]
 
     meu_aspirador = Aspirador(100, M, N, posicao_inicial_aspirador)
 
     # cria o ambiente contendo o meu aspirador
-    ambiente = Sala((M, N), [(1, 2), (2, 1)], [
+    ambiente = Sala((M, N), [(1, 2), (2, 1), (3, 1)], [
         (2, 2), (1, 1)], meu_aspirador, posicao_inicial_aspirador, (0, 0))
 
     # simula 10 passos do ambiente
