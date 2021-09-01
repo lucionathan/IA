@@ -203,6 +203,13 @@ class Aspirador:
         self.update_matrix(posicao_sujeira, 2)
         return(self.posicao_aspirador, False)
 
+    def registra_sensores(self, percepcoes, cords):
+        for i in range(len(percepcoes)):
+            if percepcoes[i] == 1:
+                self.registra_obstaculo(cords, i)
+            if percepcoes[i] == 2:
+                self.registra_sujeira(cords, i)
+
     def action_agent_program(self, percepcoes):
         # realizar busca heurística usando a avaliação heurística, o modelo do ambiente e a percepção corrente.
         # considerar que ele deve retornar à base quando a bateria estiver crítica
@@ -211,11 +218,7 @@ class Aspirador:
         cords = ["norte", "sul", "leste", "oeste"]
         funcoes_validas = {0: self.andar, 2: self.limpar, 4: self.carregar}
         
-        for i in range(len(percepcoes)):
-            if percepcoes[i] == 1:
-                self.registra_obstaculo(cords, i)
-            if percepcoes[i] == 2:
-                self.registra_sujeira(cords, i)
+        self.registra_sensores(percepcoes, cords)
                 
         funcao_invalida = True
         while(funcao_invalida):
@@ -224,6 +227,8 @@ class Aspirador:
             if percepcoes[pos] in lista_chaves:
                 funcao_invalida = False
                 return funcoes_validas[percepcoes[pos]](cords, pos)
+
+
                     
     # imprime posição do agente, o seu modelo interno do ambiente, nível da bateria
 
