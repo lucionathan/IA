@@ -40,8 +40,8 @@ class Sala:
         nova_posicao, piso_limpo = self.aspirador.action_agent_program(
             valores_vizinhos)
 
-        print("nova_posicao:", nova_posicao)
-        print("piso_limpo:", piso_limpo) # usa isso pra fazer o mapa nao limpar quando passar numa sujeira!!!!
+        # print("nova_posicao:", nova_posicao)
+        # print("piso_limpo:", piso_limpo)
 
         linha = self.posicao_aspirador[0]
         coluna = self.posicao_aspirador[1]
@@ -164,8 +164,8 @@ class Aspirador:
         if (tipo == 3):
             linha = self.posicao_aspirador[0]
             coluna = self.posicao_aspirador[1]
-            print("posicao_aspirador:", self.posicao_aspirador)
-            print("posicao_base:", self.posicao_base)
+            # print("posicao_aspirador:", self.posicao_aspirador)
+            # print("posicao_base:", self.posicao_base)
             if [linha, coluna] != self.posicao_base:
                 # significa q passou por esse no
                 self.modelo_ambiente[linha][coluna] = 9
@@ -196,7 +196,7 @@ class Aspirador:
         return nova_posicao
 
     def limpar(self, cords, pos):
-        print("comando: limpou")
+        # print("comando: limpou")
         if(self.energia-6 > self.consumo_pra_base):
             self.energia -= 5
             limpou = True
@@ -205,25 +205,25 @@ class Aspirador:
             return self.andar_por_xy(self.caminho_pra_base.pop())
 
     def carregar(self, cords, pos):
-        print("comando: carregou")
+        # print("comando: carregou")
         self.energia = 100
         return self.andar(cords, pos)
 
     def andar(self, cords, pos, limpou=False):
-        print("comando: andou")
+        # print("comando: andou")
         self.energia -= 1
         posicao = self.update_posicao(cords[pos])
         return (posicao, limpou)
 
     def registra_obstaculo(self, cords, pos):
-        print("comando: registrou obstáculo")
+        # print("comando: registrou obstáculo")
         posicao_obstaculo = self.movimentos[f'{cords[pos]}'](
             self.posicao_aspirador)
         self.update_matrix(posicao_obstaculo, 1)
         return(self.posicao_aspirador, False)
 
     def registra_sujeira(self, cords, pos):
-        print("comando: registrou sujeira")
+        # print("comando: registrou sujeira")
         # posicao_sujeira = self.movimentos[f'{cords[pos]}'](self.posicao_aspirador)
         # self.update_matrix(posicao_sujeira, 2)
         return(self.posicao_aspirador, False)
@@ -262,17 +262,17 @@ class Aspirador:
         if (caminho_base != None):
             self.caminho_pra_base = caminho_base[0]
             self.consumo_pra_base = caminho_base[1]
-            print(self.caminho_pra_base)
-            print(self.consumo_pra_base)
+            # print(self.caminho_pra_base)
+            # print(self.consumo_pra_base)
             if(self.consumo_pra_base > self.energia-2):
-                print("comando: voltando pra base")
+                # print("comando: voltando pra base")
                 resultado = self.andar_por_xy(self.caminho_pra_base[0])
                 del self.caminho_pra_base[0]
-                print(resultado)
+                # print(resultado)
                 return resultado
 
         # print(self.busca_caminho(self.posicao_aspirador))
-        print("sensores:", percepcoes)
+        # print("sensores:", percepcoes)
 
         cords = ["norte", "sul", "leste", "oeste"]
         funcoes_validas = {0: self.andar, 2: self.limpar, 4: self.carregar}
