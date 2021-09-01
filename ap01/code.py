@@ -40,7 +40,7 @@ class Sala:
             valores_vizinhos)
 
         print("nova_posicao:", nova_posicao)
-        print("piso_limpo:", piso_limpo)
+        print("piso_limpo:", piso_limpo) # usa isso pra fazer o mapa nao limpar quando passar numa sujeira!!!!
 
         linha = self.posicao_aspirador[0]
         coluna = self.posicao_aspirador[1]
@@ -79,9 +79,9 @@ class Sala:
 
         print(self.piso)
 
-        self.aspirador.print_status()
 
         self.update_matrix()
+        self.aspirador.print_status()
      # Escreva seu código aqui levando em conta o pseudo-código para
      # adicionar sujeira com maior probabilidade em certos locais:
 
@@ -145,6 +145,8 @@ class Aspirador:
         self.modelo_ambiente = np.zeros((M, N), dtype=int)
         self.modelo_ambiente[posicao_aspirador[0]][posicao_aspirador[1]] = 4
       # no modelo é guardado: contador de sujeira (0...MAX) ou obstáculo (-1)
+        self.caminho_pra_base = []
+        self.consumo_pra_base = 0
         self.posicao_base = posicao_aspirador
         self.posicao_aspirador = posicao_aspirador
 
@@ -190,9 +192,12 @@ class Aspirador:
 
     def limpar(self, cords, pos):
         print("comando: limpou")
-        self.energia -= 5
-        limpou = True
-        return self.andar(cords, pos, limpou)
+        if(self.energia-6 > self.consumo_pra_base):
+            self.energia -= 5
+            limpou = True
+            return self.andar(cords, pos, limpou)
+        else:
+            return self.andar_por_xy(self.caminho_pra_base.pop())
 
     def carregar(self, cords, pos):
         print("comando: carregou")
@@ -226,25 +231,42 @@ class Aspirador:
                 self.registra_sujeira(cords, i)
 
     def get_menor_caminho(self, caminhos):
-        print("a")
+        # print("a")
         caminhos = [x for x in caminhos if x is not None]
-        print("caminhos", caminhos)
+        # print("caminhos", caminhos)
         melhor_caminho = None
         if (len(caminhos) > 0):
             melhor_caminho = caminhos[0]
-
             for caminho in caminhos:
                 if (caminho[1] < melhor_caminho[1]):
                     melhor_caminho = caminho
-        print("melhor", melhor_caminho)
         return melhor_caminho
+
+    def andar_por_xy(self, coordenada):
+        self.energia -= 1
+        if(coordenada == self.posicao_base): self.energia = 100
+        self.update_matrix(coordenada, 3)
+        return (self.posicao_aspirador, False)
 
     def action_agent_program(self, percepcoes):
         # realizar busca heurística usando a avaliação heurística, o modelo do ambiente e a percepção corrente.
         # considerar que ele deve retornar à base quando a bateria estiver crítica
         caminho_base = self.get_menor_caminho(
             self.busca_caminho(self.posicao_aspirador))
-        print(self.busca_caminho(self.posicao_aspirador))
+
+        if (caminho_base != None):
+            self.caminho_pra_base = caminho_base[0]
+            self.consumo_pra_base = caminho_base[1]
+            print(self.caminho_pra_base)
+            print(self.consumo_pra_base)
+            if(self.consumo_pra_base > self.energia-2):
+                print("comando: voltando pra base")
+                resultado = self.andar_por_xy(self.caminho_pra_base[0])
+                del self.caminho_pra_base[0]
+                print(resultado)
+                return resultado
+
+        # print(self.busca_caminho(self.posicao_aspirador))
         print("sensores:", percepcoes)
 
         cords = ["norte", "sul", "leste", "oeste"]
@@ -273,7 +295,7 @@ class Aspirador:
         print("Posição do Aspirador:", self.posicao_aspirador)
         print("Nível de bateria:", self.energia)
         print("Modelo interno do ambiente:")
-        print(self.modelo_ambiente)
+        print(self.modelo_ambiente, "\n")
 
     def busca_caminho(self, node):
         caminhos = []
@@ -341,8 +363,8 @@ class Aspirador:
 def main():
     """Função principal da aplicação.
     """
-    M = 5
-    N = 5
+    M = 10
+    N = 10
     posicao_inicial_aspirador = [0, 0]
 
     meu_aspirador = Aspirador(100, M, N, posicao_inicial_aspirador)
@@ -352,7 +374,7 @@ def main():
         (2, 2), (1, 1)], meu_aspirador, posicao_inicial_aspirador, (0, 0))
 
     # simula 10 passos do ambiente
-    ambiente.run(40)
+    ambiente.run(70)
 
 
 if __name__ == "__main__":
