@@ -3,6 +3,7 @@ from random import uniform, randint, choice
 import collections
 import sys
 
+
 class Sala:
 
     def __init__(self, size, lista_obstaculos, locais_sujeira, aspirador, posicao_aspirador, posicao_base_recarregamento):
@@ -30,14 +31,14 @@ class Sala:
         coordenadas_vizinhos = get_vizinhos(self.piso, self.posicao_aspirador)
         valores_vizinhos = []
         for elemento in coordenadas_vizinhos:
-            if (elemento != [-1,-1]):
+            if (elemento != [-1, -1]):
                 valores_vizinhos.append(self.piso[elemento[0]][elemento[1]])
             else:
                 valores_vizinhos.append(-1)
 
         nova_posicao, piso_limpo = self.aspirador.action_agent_program(
             valores_vizinhos)
-    
+
         print("nova_posicao:", nova_posicao)
         print("piso_limpo:", piso_limpo)
 
@@ -53,8 +54,6 @@ class Sala:
         self.piso[linha_nova][coluna_nova] = 3
 
         self.posicao_aspirador = nova_posicao
-
-
 
     def step(self):  # atualiza sujeira, realiza a interação do agente-ambiente
 
@@ -107,6 +106,7 @@ class Sala:
             self.step()
         print(self.piso)
 
+
 def get_vizinhos(piso, pos):
     norte, sul, leste, oeste = [[-1, -1], [-1, -1], [-1, -1], [-1, -1]]
     if(pos[0] > 0):
@@ -114,16 +114,16 @@ def get_vizinhos(piso, pos):
 
     if(pos[0] < len(piso)-1):
         sul = [pos[0] + 1, pos[1]]
-                        
+
     if(pos[1] < len(piso[0])-1):
         leste = [pos[0], pos[1]+1]
 
     if(pos[1] > 0):
         oeste = [pos[0], pos[1]-1]
-    
-    print ([norte,sul,leste,oeste])
-                        
-    return [norte,sul,leste,oeste]
+
+    print([norte, sul, leste, oeste])
+
+    return [norte, sul, leste, oeste]
 
 
 class Aspirador:
@@ -160,7 +160,8 @@ class Aspirador:
             print("posicao_aspirador:", self.posicao_aspirador)
             print("posicao_base:", self.posicao_base)
             if [linha, coluna] != self.posicao_base:
-                self.modelo_ambiente[linha][coluna] = 9 # significa q passou por esse no
+                # significa q passou por esse no
+                self.modelo_ambiente[linha][coluna] = 9
             else:
                 self.modelo_ambiente[linha][coluna] = 4
             self.posicao_aspirador = posicao
@@ -198,21 +199,22 @@ class Aspirador:
         self.energia = 100
         return self.andar(cords, pos)
 
-    def andar(self, cords, pos, limpou = False):
+    def andar(self, cords, pos, limpou=False):
         print("comando: andou")
-        self.energia -= 1 
+        self.energia -= 1
         posicao = self.update_posicao(cords[pos])
         return (posicao, limpou)
 
     def registra_obstaculo(self, cords, pos):
         print("comando: registrou obstáculo")
-        posicao_obstaculo = self.movimentos[f'{cords[pos]}'](self.posicao_aspirador) 
+        posicao_obstaculo = self.movimentos[f'{cords[pos]}'](
+            self.posicao_aspirador)
         self.update_matrix(posicao_obstaculo, 1)
         return(self.posicao_aspirador, False)
 
     def registra_sujeira(self, cords, pos):
         print("comando: registrou sujeira")
-        # posicao_sujeira = self.movimentos[f'{cords[pos]}'](self.posicao_aspirador) 
+        # posicao_sujeira = self.movimentos[f'{cords[pos]}'](self.posicao_aspirador)
         # self.update_matrix(posicao_sujeira, 2)
         return(self.posicao_aspirador, False)
 
@@ -226,22 +228,23 @@ class Aspirador:
     def action_agent_program(self, percepcoes):
         # realizar busca heurística usando a avaliação heurística, o modelo do ambiente e a percepção corrente.
         # considerar que ele deve retornar à base quando a bateria estiver crítica
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAMINHOS====", self.busca_caminho(self.posicao_aspirador))
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAMINHOS====",
+              self.busca_caminho(self.posicao_aspirador))
         print("sensores:", percepcoes)
 
         cords = ["norte", "sul", "leste", "oeste"]
         funcoes_validas = {0: self.andar, 2: self.limpar, 4: self.carregar}
-        
+
         self.registra_sensores(percepcoes, cords)
-                
+
         funcao_invalida = True
         while(funcao_invalida):
-            pos = randint(0,3)
+            pos = randint(0, 3)
             lista_chaves = list(funcoes_validas.keys())
             if percepcoes[pos] in lista_chaves:
                 funcao_invalida = False
                 return funcoes_validas[percepcoes[pos]](cords, pos)
-                    
+
     # imprime posição do agente, o seu modelo interno do ambiente, nível da bateria
 
     def print_status(self):
@@ -251,16 +254,22 @@ class Aspirador:
         print(self.modelo_ambiente)
 
     def busca_caminho(self, node):
-        return self.bfs(self.modelo_ambiente, self.posicao_aspirador)
-    
+        a = [[4, 9, 9, 0, 0],
+             [9, 9, 1, 0, 0],
+             [9, 1, 0, 0, 0],
+             [9, 1, 0, 0, 0],
+             [9, 3, 0, 0, 0]]
+        print('ZZZZZZZZZZZZZZZZAPPPPPPPPPPPPPPP')
+        print(self.bfs(a, node))
+
 # percep(pos_node_atual):
 #     norte, sul, leste, oeste = self.get_vizinhos()
     def tem_node_no_caminho(self, node, caminho):
+
         return node in caminho
 
-
     def bfs(self, grid, start):
-        
+
         queue = collections.deque([[start]])
 
         seen = set((start[0], start[1]))
@@ -269,8 +278,8 @@ class Aspirador:
             x, y = path[-1]
             if grid[x][y] == "4":
                 return path
-            for x2, y2 in ((x+1,y), (x-1,y), (x,y+1), (x,y-1)):
-                if 0 <= x2 < len(self.modelo_ambiente[0]) and 0 <= y2 < len(self.modelo_ambiente[0])and grid[x2][y2] == "9" and (x2, y2) not in seen:
+            for x2, y2 in ((x+1, y), (x-1, y), (x, y+1), (x, y-1)):
+                if 0 <= x2 < len(self.modelo_ambiente[0]) and 0 <= y2 < len(self.modelo_ambiente[0]) and grid[x2][y2] == "9" and (x2, y2) not in seen:
                     queue.append(path + [(x2, y2)])
                     seen.add((x2, y2))
         print(path)
@@ -302,6 +311,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-    
 
 # tem 4 sensores

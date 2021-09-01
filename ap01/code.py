@@ -3,6 +3,7 @@ from random import uniform, randint, choice
 from collections import deque
 import sys
 
+
 class Sala:
 
     def __init__(self, size, lista_obstaculos, locais_sujeira, aspirador, posicao_aspirador, posicao_base_recarregamento):
@@ -30,14 +31,14 @@ class Sala:
         coordenadas_vizinhos = get_vizinhos(self.piso, self.posicao_aspirador)
         valores_vizinhos = []
         for elemento in coordenadas_vizinhos:
-            if (elemento != [-1,-1]):
+            if (elemento != [-1, -1]):
                 valores_vizinhos.append(self.piso[elemento[0]][elemento[1]])
             else:
                 valores_vizinhos.append(-1)
 
         nova_posicao, piso_limpo = self.aspirador.action_agent_program(
             valores_vizinhos)
-    
+
         print("nova_posicao:", nova_posicao)
         print("piso_limpo:", piso_limpo)
 
@@ -53,8 +54,6 @@ class Sala:
         self.piso[linha_nova][coluna_nova] = 3
 
         self.posicao_aspirador = nova_posicao
-
-
 
     def step(self):  # atualiza sujeira, realiza a interação do agente-ambiente
 
@@ -107,6 +106,7 @@ class Sala:
             self.step()
         print(self.piso)
 
+
 def get_vizinhos(piso, pos):
     norte, sul, leste, oeste = [[-1, -1], [-1, -1], [-1, -1], [-1, -1]]
     if(pos[0] > 0):
@@ -114,16 +114,16 @@ def get_vizinhos(piso, pos):
 
     if(pos[0] < len(piso)-1):
         sul = [pos[0] + 1, pos[1]]
-                        
+
     if(pos[1] < len(piso[0])-1):
         leste = [pos[0], pos[1]+1]
 
     if(pos[1] > 0):
         oeste = [pos[0], pos[1]-1]
-    
+
     # print ([norte,sul,leste,oeste])
-                        
-    return [norte,sul,leste,oeste]
+
+    return [norte, sul, leste, oeste]
 
 
 class Aspirador:
@@ -160,7 +160,8 @@ class Aspirador:
             print("posicao_aspirador:", self.posicao_aspirador)
             print("posicao_base:", self.posicao_base)
             if [linha, coluna] != self.posicao_base:
-                self.modelo_ambiente[linha][coluna] = 9 # significa q passou por esse no
+                # significa q passou por esse no
+                self.modelo_ambiente[linha][coluna] = 9
             else:
                 self.modelo_ambiente[linha][coluna] = 4
             self.posicao_aspirador = posicao
@@ -198,21 +199,22 @@ class Aspirador:
         self.energia = 100
         return self.andar(cords, pos)
 
-    def andar(self, cords, pos, limpou = False):
+    def andar(self, cords, pos, limpou=False):
         print("comando: andou")
-        self.energia -= 1 
+        self.energia -= 1
         posicao = self.update_posicao(cords[pos])
         return (posicao, limpou)
 
     def registra_obstaculo(self, cords, pos):
         print("comando: registrou obstáculo")
-        posicao_obstaculo = self.movimentos[f'{cords[pos]}'](self.posicao_aspirador) 
+        posicao_obstaculo = self.movimentos[f'{cords[pos]}'](
+            self.posicao_aspirador)
         self.update_matrix(posicao_obstaculo, 1)
         return(self.posicao_aspirador, False)
 
     def registra_sujeira(self, cords, pos):
         print("comando: registrou sujeira")
-        # posicao_sujeira = self.movimentos[f'{cords[pos]}'](self.posicao_aspirador) 
+        # posicao_sujeira = self.movimentos[f'{cords[pos]}'](self.posicao_aspirador)
         # self.update_matrix(posicao_sujeira, 2)
         return(self.posicao_aspirador, False)
 
@@ -222,32 +224,37 @@ class Aspirador:
                 self.registra_obstaculo(cords, i)
             if percepcoes[i] == 2:
                 self.registra_sujeira(cords, i)
-            
+
     def get_menor_caminho(self, caminhos):
         print("a")
-        # caminhos_validos = [x for x in caminhos if x is not None]
-        # melhor_caminho = None
-        # if (len(caminhos_validos) > 0):
-        #     for caminho in caminhos_validos:
-        #         if (caminho[1] < melhor_caminho[1]):
-        #             melhor_caminho = caminho
-        # return melhor_caminho
-    
+        caminhos = [x for x in caminhos if x is not None]
+        print("caminhos", caminhos)
+        melhor_caminho = None
+        if (len(caminhos) > 0):
+            melhor_caminho = caminhos[0]
+
+            for caminho in caminhos:
+                if (caminho[1] < melhor_caminho[1]):
+                    melhor_caminho = caminho
+        print("melhor", melhor_caminho)
+        return melhor_caminho
+
     def action_agent_program(self, percepcoes):
         # realizar busca heurística usando a avaliação heurística, o modelo do ambiente e a percepção corrente.
         # considerar que ele deve retornar à base quando a bateria estiver crítica
-        caminho_base = self.get_menor_caminho(self.busca_caminho(self.posicao_aspirador))
+        caminho_base = self.get_menor_caminho(
+            self.busca_caminho(self.posicao_aspirador))
         print(self.busca_caminho(self.posicao_aspirador))
         print("sensores:", percepcoes)
 
         cords = ["norte", "sul", "leste", "oeste"]
         funcoes_validas = {0: self.andar, 2: self.limpar, 4: self.carregar}
-        
+
         self.registra_sensores(percepcoes, cords)
-                
+
         funcao_invalida = True
         while(funcao_invalida):
-            pos = randint(0,3)
+            pos = randint(0, 3)
             # pos = 1
             lista_chaves = list(funcoes_validas.keys())
             if percepcoes[pos] in lista_chaves:
@@ -273,16 +280,16 @@ class Aspirador:
         for vizinho in get_vizinhos(self.modelo_ambiente, node):
             caminhos.append(self.funcao(vizinho, [], 1))
         return caminhos
-    
+
 # percep(pos_node_atual):
 #     norte, sul, leste, oeste = self.get_vizinhos()
     def tem_node_no_caminho(self, node, caminho):
         return node in caminho
 
-    def funcao (self, node, caminho, peso):
+    def funcao(self, node, caminho, peso):
         x = node[0]
         y = node[1]
-        
+
         # print("////////////////////////////////////////////////////////////////////////")
         # print("Node [x,y]:", node, "valor:", self.modelo_ambiente[x][y])
         # print("Caminho Atual:", caminho)
@@ -292,36 +299,37 @@ class Aspirador:
             # print("caminho achado:", caminho)
             return (caminho, len(caminho))
 
-            
         coordenadas_vizinhos = get_vizinhos(self.modelo_ambiente, node)
         valores_vizinhos = []
 
         for elemento in coordenadas_vizinhos:
-            if (elemento != [-1,-1]):
-                valores_vizinhos.append(self.modelo_ambiente[elemento[0]][elemento[1]])
+            if (elemento != [-1, -1]):
+                valores_vizinhos.append(
+                    self.modelo_ambiente[elemento[0]][elemento[1]])
             else:
                 valores_vizinhos.append(-1)
 
-        valores_validos = [9,4]
-        indices_vizinhos_validos =[]
+        valores_validos = [9, 4]
+        indices_vizinhos_validos = []
 
         for i in range(len(valores_vizinhos)):
             if valores_vizinhos[i] in valores_validos:
                 indices_vizinhos_validos.append(i)
 
-        if (not self.tem_node_no_caminho(node,caminho) and self.modelo_ambiente[x][y] in valores_validos):
+        if (not self.tem_node_no_caminho(node, caminho) and self.modelo_ambiente[x][y] in valores_validos):
             caminhos = []
             for i in indices_vizinhos_validos:
                 caminho_node = caminho.copy()
                 caminho_node.append(node)
-                caminhos.append(self.funcao(coordenadas_vizinhos[i], caminho_node, len(caminho_node)))
+                caminhos.append(self.funcao(
+                    coordenadas_vizinhos[i], caminho_node, len(caminho_node)))
             menor_peso = sys.maxsize
             melhor_caminho = None
             for caminho_achado in caminhos:
                 if (caminho_achado != None and caminho_achado[1] < menor_peso):
                     menor_peso = caminho_achado[1]
                     melhor_caminho = caminho_achado
-                    
+
             return melhor_caminho
 
 
